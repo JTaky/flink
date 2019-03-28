@@ -145,7 +145,7 @@ public class LaunchableMesosWorker implements LaunchableTask {
 
 		@Override
 		public double getDisk() {
-			return 0.0;
+			return 1000.0;
 		}
 
 		@Override
@@ -189,6 +189,7 @@ public class LaunchableMesosWorker implements LaunchableTask {
 				"cpus=" + getCPUs() +
 				", memory=" + getMemory() +
 				", gpus=" + getGPUs() +
+				", disk=" + getDisk() +
 				"}";
 		}
 	}
@@ -220,6 +221,8 @@ public class LaunchableMesosWorker implements LaunchableTask {
 		taskInfo.addAllResources(allocation.takeScalar("cpus", taskRequest.getCPUs(), roles));
 		taskInfo.addAllResources(allocation.takeScalar("gpus", taskRequest.getGPUs(), roles));
 		taskInfo.addAllResources(allocation.takeScalar("mem", taskRequest.getMemory(), roles));
+		taskInfo.addAllResources(allocation.takeScalar("disk", taskRequest.getDisk(), roles));
+		// taskInfo.addAllResources(allocation.takeScalar("networkBandwidth", taskRequest.getNetworkMbps(), roles));
 
 		final Protos.CommandInfo.Builder cmd = taskInfo.getCommandBuilder();
 		final Protos.Environment.Builder env = cmd.getEnvironmentBuilder();

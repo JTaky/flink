@@ -243,3 +243,9 @@ rest.port: 8081
 # Interval in milliseconds for refreshing the monitored directories.
 #historyserver.archive.fs.refresh-interval: 10000
 
+#====================================================================================
+# Debug
+#==================================================================================
+
+env.java.opts.taskmanager: -agentlib:jdwp=transport=dt_socket,server=y,address=31153,suspend=n
+env.java.opts.jobmanager: -agentlib:jdwp=transport=dt_socket,server=y,address=31154,suspend=n

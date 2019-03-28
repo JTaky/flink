@@ -95,7 +95,7 @@ import scala.concurrent.duration.FiniteDuration;
 /**
  * The Mesos implementation of the resource manager.
  */
-public class MesosResourceManager extends ResourceManager<RegisteredMesosWorkerNode> {
+public class  MesosResourceManager extends ResourceManager<RegisteredMesosWorkerNode> {
 	protected static final Logger LOG = LoggerFactory.getLogger(MesosResourceManager.class);
 
 	/** The Flink configuration. */

@@ -150,15 +150,15 @@ class LaunchCoordinator(
     case Event(offers: ResourceOffers, data: GatherData) =>
       val leases = offers.offers().asScala.map(new Offer(_))
       if(LOG.isInfoEnabled) {
-        val (cpus, gpus, mem) = leases.foldLeft((0.0,0.0,0.0)) {
-          (z,o) => (z._1 + o.cpuCores(), z._2 + o.gpus(), z._3 + o.memoryMB())
+        val (cpus, gpus, mem, disk) = leases.foldLeft((0.0,0.0,0.0,0.0)) {
+          (z,o) => (z._1 + o.cpuCores(), z._2 + o.gpus(), z._3 + o.memoryMB(), z._3 + o.diskMB())
         }
         LOG.info(s"Received offer(s) of $mem MB, $cpus cpus, $gpus gpus:")
         for(l <- leases) {
           val reservations = l.getResources.asScala.map(_.getRole).toSet
-          LOG.info(
-            s"  ${l.getId} from ${l.hostname()} of ${l.memoryMB()} MB," +
-            s" ${l.cpuCores()} cpus, ${l.gpus()} gpus" +
+          LOG.info(s" '$l' has ${l.memoryMB()} MB," +
+            s" ${l.cpuCores()} cpus, ${l.getScalarValue("gpus")} gpus," +
+            s"${l.diskMB} mbs, ${l.networkMbps()}, ${l.getScalarValues}" +
             s" for ${reservations.mkString("[", ",", "]")}")
         }
       }
@@ -171,7 +171,7 @@ class LaunchCoordinator(
         + s" new offer(s) plus outstanding offers.")
 
       // attempt to assign the outstanding tasks using the optimizer
-      val result = optimizer.scheduleOnce(
+      val result: SchedulingResult = optimizer.scheduleOnce(
         data.tasks.map(_.taskRequest).asJava, data.newLeases.asJava)
 
       if(LOG.isInfoEnabled) {
@@ -180,10 +180,11 @@ class LaunchCoordinator(
         for(vm <- optimizer.getVmCurrentStates.asScala) {
           val lease = vm.getCurrAvailableResources
           LOG.info(s"  ${vm.getHostname} has ${lease.memoryMB()} MB," +
-            s" ${lease.cpuCores()} cpus, ${lease.getScalarValue("gpus")} gpus")
+            s" ${lease.cpuCores()} cpus, ${lease.getScalarValue("gpus")} gpus," +
+            s"${lease.diskMB()} mbs, ${lease.networkMbps()}, ${lease.getScalarValues}")
         }
       }
-      log.debug(result.toString)
+      log.info(result.toString)
 
       for((hostname, assignments) <- result.getResultMap.asScala) {
 
@@ -198,7 +199,7 @@ class LaunchCoordinator(
           .flatMap(_.getLaunch.getTaskInfosList.asScala.map(_.getTaskId))
         for(taskId <- launchedTasks) {
           val task = remaining.remove(taskId.getValue).get
-          LOG.debug(s"Assigned task ${task.taskRequest().getId} to host ${hostname}.")
+          LOG.info(s"Assigned task ${task.taskRequest().getId} to host ${hostname}.")
           optimizer.getTaskAssigner.call(task.taskRequest, hostname)
         }
 
