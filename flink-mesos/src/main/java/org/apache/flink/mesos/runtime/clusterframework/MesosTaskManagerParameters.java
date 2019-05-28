@@ -57,7 +57,7 @@ public class MesosTaskManagerParameters {
 	public static final ConfigOption<Integer> MESOS_RM_TASKS_MEMORY_MB =
 		key("mesos.resourcemanager.tasks.mem")
 		.defaultValue(1024)
-		.withDescription("Memory to assign to the Mesos workers in MB.");
+		.withDescription(Description.builder().text("Memory to assign to the Mesos workers in MB.").build());
 
 	public static final ConfigOption<Integer> MESOS_RM_TASKS_DISK_MB =
 		key("mesos.resourcemanager.tasks.disk")
@@ -67,7 +67,8 @@ public class MesosTaskManagerParameters {
 	public static final ConfigOption<Integer> MESOS_RM_TASKS_NETWORK_MB_PER_SEC =
 		key("mesos.resourcemanager.tasks.network.bandwidth")
 			.defaultValue(0)
-			.withDescription(Description.builder().text("Network bandwidth to assign to the Mesos workers in MB per sec.").build());
+			.withDescription(Description.builder().text("Network bandwidth to assign to the Mesos workers " +
+				"in MB per sec.").build());
 
 	public static final ConfigOption<String> MESOS_RM_NETWORK_RESOURCE_NAME =
 		key("mesos.resourcemanager.network.resource.name")
@@ -77,7 +78,7 @@ public class MesosTaskManagerParameters {
 	public static final ConfigOption<Double> MESOS_RM_TASKS_CPUS =
 		key("mesos.resourcemanager.tasks.cpus")
 		.defaultValue(0.0)
-		.withDescription("CPUs to assign to the Mesos workers.");
+		.withDescription(Description.builder().text("CPUs to assign to the Mesos workers.").build());
 
 	public static final ConfigOption<Integer> MESOS_RM_TASKS_GPUS =
 		key("mesos.resourcemanager.tasks.gpus")
@@ -87,12 +88,12 @@ public class MesosTaskManagerParameters {
 	public static final ConfigOption<String> MESOS_RM_CONTAINER_TYPE =
 		key("mesos.resourcemanager.tasks.container.type")
 		.defaultValue("mesos")
-		.withDescription("Type of the containerization used: “mesos” or “docker”.");
+		.withDescription(Description.builder().text("Type of the containerization used: “mesos” or “docker”.").build());
 
 	public static final ConfigOption<String> MESOS_RM_CONTAINER_IMAGE_NAME =
 		key("mesos.resourcemanager.tasks.container.image.name")
 		.noDefaultValue()
-		.withDescription("Image name to use for the container.");
+		.withDescription(Description.builder().text("Image name to use for the container.").build());
 
 	public static final ConfigOption<String> MESOS_TM_HOSTNAME =
 		key("mesos.resourcemanager.tasks.hostname")
@@ -100,7 +101,8 @@ public class MesosTaskManagerParameters {
 		.withDescription(Description.builder()
 			.text("Optional value to define the TaskManager’s hostname. " +
 				"The pattern _TASK_ is replaced by the actual id of the Mesos task. " +
-				"This can be used to configure the TaskManager to use Mesos DNS (e.g. _TASK_.flink-service.mesos) for name lookups.")
+				"This can be used to configure the TaskManager to use Mesos DNS " +
+				"(e.g. _TASK_.flink-service.mesos) for name lookups.")
 			.build());
 
 	public static final ConfigOption<String> MESOS_TM_CMD =
@@ -117,8 +119,8 @@ public class MesosTaskManagerParameters {
 	public static final ConfigOption<String> MESOS_TM_URIS =
 		key("mesos.resourcemanager.tasks.uris")
 		.noDefaultValue()
-		.withDescription("A comma separated list of URIs of custom artifacts to be downloaded into the sandbox" +
-			" of Mesos workers.");
+		.withDescription(Description.builder().text("A comma separated list of URIs of custom artifacts to " +
+			" be downloaded into the sandbox of Mesos workers.").build());
 
 	public static final ConfigOption<String> MESOS_RM_CONTAINER_VOLUMES =
 		key("mesos.resourcemanager.tasks.container.volumes")
@@ -135,8 +137,8 @@ public class MesosTaskManagerParameters {
 	public static final ConfigOption<Boolean> MESOS_RM_CONTAINER_DOCKER_FORCE_PULL_IMAGE =
 		key("mesos.resourcemanager.tasks.container.docker.force-pull-image")
 		.defaultValue(false)
-		.withDescription("Instruct the docker containerizer to forcefully pull the image rather than" +
-			" reuse a cached version.");
+		.withDescription(Description.builder().text("Instruct the docker containerizer to forcefully pull the " +
+			"image rather than reuse a cached version.").build());
 
 	public static final ConfigOption<String> MESOS_CONSTRAINTS_HARD_HOSTATTR =
 		key("mesos.constraints.hard.hostattribute")
