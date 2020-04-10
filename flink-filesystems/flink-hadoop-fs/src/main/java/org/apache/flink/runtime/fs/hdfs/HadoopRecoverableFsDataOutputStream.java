@@ -39,7 +39,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.time.Duration;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -175,19 +174,19 @@ class HadoopRecoverableFsDataOutputStream extends RecoverableFsDataOutputStream 
 
 	private static void ensureTruncateInitialized() throws FlinkRuntimeException {
 		if (truncateHandle == null) {
-			Method truncateMethod;
-			try {
-				truncateMethod = FileSystem.class.getMethod("truncate", Path.class, long.class);
-			}
-			catch (NoSuchMethodException e) {
-				throw new FlinkRuntimeException("Could not find a public truncate method on the Hadoop File System.");
-			}
-
-			if (!Modifier.isPublic(truncateMethod.getModifiers())) {
-				throw new FlinkRuntimeException("Could not find a public truncate method on the Hadoop File System.");
-			}
-
-			truncateHandle = truncateMethod;
+//			Method truncateMethod;
+//			try {
+//				truncateMethod = FileSystem.class.getMethod("truncate", Path.class, long.class);
+//			}
+//			catch (NoSuchMethodException e) {
+//				throw new FlinkRuntimeException("Could not find a public truncate method on the Hadoop File System.");
+//			}
+//
+//			if (!Modifier.isPublic(truncateMethod.getModifiers())) {
+//				throw new FlinkRuntimeException("Could not find a public truncate method on the Hadoop File System.");
+//			}
+//
+//			truncateHandle = truncateMethod;
 		}
 	}
 
