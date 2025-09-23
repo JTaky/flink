@@ -23,6 +23,7 @@ import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.IllegalConfigurationException;
 import org.apache.flink.configuration.SecurityOptions;
+import org.apache.flink.core.security.watch.LocalFSDirectoryWatcher;
 import org.apache.flink.core.security.watch.LocalFSWatchSingleton;
 import org.apache.flink.runtime.io.network.netty.SSLHandlerFactory;
 import org.apache.flink.util.StringUtils;
@@ -364,7 +365,7 @@ public class SSLUtils {
 
         ReloadableJdkSslContext reloadableJdkSslContext =
                 new ReloadableJdkSslContext(config, clientMode, provider);
-        if (SecurityOptions.isReloadCertificate(config) && watchForCertificateChange) {
+        if (SecurityOptions.isCertificateReloadEnabled(config) && watchForCertificateChange) {
             HashSet<Path> certificatePaths = new HashSet<>();
             certificatePaths.add(
                     Path.of(
@@ -382,8 +383,8 @@ public class SSLUtils {
             }
             Path[] pathsToWatch = new Path[certificatePaths.size()];
             certificatePaths.toArray(pathsToWatch);
-            LocalFSWatchSingleton localFSWatchSingleton = LocalFSWatchSingleton.getInstance();
-            localFSWatchSingleton.registerPath(pathsToWatch, reloadableJdkSslContext);
+            LocalFSDirectoryWatcher localFSWatchSingleton = LocalFSWatchSingleton.getInstance();
+            localFSWatchSingleton.registerDirectory(pathsToWatch, reloadableJdkSslContext);
         }
 
         return reloadableJdkSslContext;
@@ -431,7 +432,7 @@ public class SSLUtils {
         ReloadableSslContext reloadableSslContext =
                 new ReloadableSslContext(config, clientMode, clientAuth, provider);
 
-        if (SecurityOptions.isReloadCertificate(config)) {
+        if (SecurityOptions.isCertificateReloadEnabled(config)) {
             HashSet<Path> certificatePaths = new HashSet<>();
             String keystoreFilePath =
                     config.get(
@@ -450,8 +451,8 @@ public class SSLUtils {
 
             Path[] pathsToWatch = new Path[certificatePaths.size()];
             certificatePaths.toArray(pathsToWatch);
-            LocalFSWatchSingleton localFSWatchSingleton = LocalFSWatchSingleton.getInstance();
-            localFSWatchSingleton.registerPath(pathsToWatch, reloadableSslContext);
+            LocalFSDirectoryWatcher localFSWatchSingleton = LocalFSWatchSingleton.getInstance();
+            localFSWatchSingleton.registerDirectory(pathsToWatch, reloadableSslContext);
         }
 
         return reloadableSslContext;
