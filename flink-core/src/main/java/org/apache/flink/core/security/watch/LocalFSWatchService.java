@@ -18,6 +18,8 @@
 
 package org.apache.flink.core.security.watch;
 
+import org.apache.flink.annotation.VisibleForTesting;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -35,11 +38,14 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 public class LocalFSWatchService extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(LocalFSWatchService.class);
 
+    @VisibleForTesting AtomicBoolean running = new AtomicBoolean(false);
+
     public void run() {
         try {
+            running.set(true);
             while (true) {
                 for (Map.Entry<WatchService, LocalFSWatchServiceListener> entry :
-                        LocalFSWatchSingleton.getInstance().watchers.entrySet()) {
+                        LocalFSWatchSingleton.getInstance().getWatchers()) {
                     LOG.debug("Taking watch key");
                     WatchKey watchKey = entry.getKey().poll();
                     if (watchKey == null) {
@@ -47,8 +53,6 @@ public class LocalFSWatchService extends Thread {
                     }
                     LOG.debug("Watch key arrived");
                     for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
-                        System.out.println(watchEvent.kind());
-                        System.out.println(watchEvent.context());
                         if (watchEvent.kind() == OVERFLOW) {
                             LOG.error("Filesystem events may have been lost or discarded");
                             Thread.yield();
@@ -67,6 +71,7 @@ public class LocalFSWatchService extends Thread {
             }
         } catch (Exception e) {
             LOG.error("Filesystem watcher received exception and stopped: ", e);
+            running.set(false);
             throw new RuntimeException(e);
         }
     }

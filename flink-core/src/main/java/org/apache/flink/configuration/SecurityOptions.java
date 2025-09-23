@@ -618,7 +618,6 @@ public class SecurityOptions {
                                     + "forcibly. (-1 = use system default)")
                     .withDeprecatedKeys("security.ssl.close-notify-flush-timeout");
 
-    // TODO check all documentation are well updated (explain mechanism)
     /** Indicate if changes on keystore/truststore should leads to reload of the certificate. */
     @Documentation.Section(Documentation.Sections.SECURITY_SSL)
     public static final ConfigOption<Boolean> SSL_RELOAD =
@@ -626,7 +625,7 @@ public class SecurityOptions {
                     .booleanType()
                     .defaultValue(false)
                     .withDescription(
-                            "Indicate if changes on keystore/truststore should leads to reload of the certificate.");
+                            "If enabled, the application will monitor the keystore and truststore files for any changes. When a change is detected, internal network components (like Netty, Pekko, or BlobServer) will automatically reload the keystore/truststore certificates.");
 
     /**
      * Checks whether SSL for internal communication (rpc, data transport, blob server) is enabled.

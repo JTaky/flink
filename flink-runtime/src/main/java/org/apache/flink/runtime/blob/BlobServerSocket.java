@@ -34,13 +34,13 @@ import javax.net.ServerSocketFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** This class implements socket management (open, close) for the BLOB server. */
-public class BlobServerSocket implements LocalFSWatchServiceListener {
+public class BlobServerSocket
+        extends LocalFSWatchServiceListener.AbstractLocalFSWatchServiceListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlobServerSocket.class);
 
@@ -49,8 +49,8 @@ public class BlobServerSocket implements LocalFSWatchServiceListener {
     private final String serverPortRange;
     private ServerSocket serverSocket;
     private final int maxConnections;
+    private int reloadCounter = 0;
     private final AtomicBoolean firstCreation = new AtomicBoolean(true);
-    private final AtomicBoolean toReload = new AtomicBoolean(false);
 
     public BlobServerSocket(Configuration config, int backlog, int maxConnections)
             throws IOException {
@@ -62,27 +62,23 @@ public class BlobServerSocket implements LocalFSWatchServiceListener {
         createSocket();
     }
 
-    @Override
-    public void onFileOrDirectoryModified(Path relativePath) {
-        toReload.set(true);
-    }
-
     public ServerSocket getServerSocket() {
         return serverSocket;
     }
 
+    /**
+     * Recreates a socket with a new ssl certificates.
+     *
+     * @return true if socket was recreated, false otherwise
+     */
     public synchronized boolean reloadContextIfNeeded() {
-        if (toReload.compareAndSet(true, false)) {
-            try {
-                close();
-                createSocket();
-                return true;
-            } catch (Exception e) {
-                LOG.warn("Failed to reload SSL context", e);
-                toReload.set(true);
-            }
-        }
-        return false;
+        return reloadContextIfNeeded(this::reloadContext);
+    }
+
+    private void reloadContext() throws IOException {
+        close();
+        createSocket();
+        reloadCounter++;
     }
 
     private synchronized void createSocket() throws IOException {
@@ -140,6 +136,10 @@ public class BlobServerSocket implements LocalFSWatchServiceListener {
      */
     public int getPort() {
         return serverSocket.getLocalPort();
+    }
+
+    public int getReloadCounter() {
+        return reloadCounter;
     }
 
     public void close() throws IOException {
