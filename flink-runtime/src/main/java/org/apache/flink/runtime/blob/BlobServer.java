@@ -998,7 +998,6 @@ public class BlobServer extends Thread
      *
      * @return address on which the server is listening
      */
-    @Override
     public InetAddress getAddress() {
         InetAddress bindAddr = blobServerSocket.getServerSocket().getInetAddress();
         if (bindAddr.getHostAddress().equals(NetUtils.getWildcardIPAddress())) {
